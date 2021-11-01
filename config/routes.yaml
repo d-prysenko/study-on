@@ -1,0 +1,61 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+
+course_index:
+  path:       /courses
+  controller: App\Controller\CourseController::index
+  methods:    GET
+
+course_new:
+  path:       /courses/new
+  controller: App\Controller\CourseController::new
+  methods:    GET|POST
+
+course_show:
+  path:       /courses/{id}
+  controller: App\Controller\CourseController::show
+  methods:    GET
+
+course_edit:
+  path:       /courses/{id}/edit
+  controller: App\Controller\CourseController::edit
+  methods:    GET|POST
+
+course_delete:
+  path:       /courses/{id}
+  controller: App\Controller\CourseController::delete
+  methods:    POST
+
+index_redirect:
+  path:       /
+  controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
+  defaults:
+    route: 'course_index'
+    permanent: true
+    keepRequestMethod: true
+
+
+
+lesson_new:
+  path:       /lesson/new
+  controller: App\Controller\LessonController::new
+  methods:    GET|POST
+
+lesson_show:
+  path:       /lesson/{id}
+  controller: App\Controller\LessonController::show
+  methods:    GET
+
+lesson_edit:
+  path:       /lesson/{id}/edit
+  controller: App\Controller\LessonController::edit
+  methods:    GET|POST
+
+lesson_delete:
+  path:       /lesson/{id}
+  controller: App\Controller\LessonController::delete
+  methods:    POST
+
+

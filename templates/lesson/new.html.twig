@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Lesson{% endblock %}
+
+{% block body %}
+    <h1>Create new Lesson</h1>
+{#    {{ dump(form.vars.value.course.id) }}#}
+    {{ include('lesson/_form.html.twig') }}
+
+{#    {{ dump(form) }}#}
+
+    <a href="{{ path('course_show', {'id': form.course.vars.value}) }}">back to course</a>
+{% endblock %}
