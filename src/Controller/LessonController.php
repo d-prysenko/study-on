@@ -37,8 +37,6 @@ class LessonController extends AbstractController
             $course = $courseRep->findOneBy(['id' => $course_id]);
 
             if (!$course) {
-                // TODO: Show custom error page here
-
                 throw new NotFoundHttpException('There is no course with such id');
             }
 
