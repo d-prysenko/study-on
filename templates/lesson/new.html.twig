@@ -1,13 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Lesson{% endblock %}
+{% block title %}Новый урок{% endblock %}
 
 {% block body %}
-    <h1>Create new Lesson</h1>
+    <h1>Создать новый урок</h1>
 {#    {{ dump(form.vars.value.course.id) }}#}
+
     {{ include('lesson/_form.html.twig') }}
 
-{#    {{ dump(form) }}#}
+    <hr>
 
-    <a href="{{ path('course_show', {'id': form.course.vars.value}) }}">back to course</a>
+    <a class="btn btn-outline-secondary" href="{{ path('course_show', {'id': form.course.vars.value}) }}">Назад к курсу</a>
 {% endblock %}

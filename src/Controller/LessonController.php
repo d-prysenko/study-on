@@ -37,8 +37,7 @@ class LessonController extends AbstractController
             $course = $courseRep->findOneBy(['id' => $course_id]);
 
             if (!$course) {
-                // TODO: Show error page here
-                // there is no course with such id
+                // TODO: Show custom error page here
 
                 throw new NotFoundHttpException('There is no course with such id');
             }
@@ -50,7 +49,6 @@ class LessonController extends AbstractController
             'form' => $form,
         ]);
     }
-
 
     public function show(Lesson $lesson): Response
     {

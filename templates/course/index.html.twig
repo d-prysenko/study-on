@@ -3,6 +3,7 @@
 {% block title %}Course index{% endblock %}
 
 {% block body %}
+
     <h1>Курсы</h1>
 
     {% for course in courses %}
@@ -17,5 +18,5 @@
         </tr>
     {% endfor %}
     <br>
-    <a href="{{ path('course_new') }}">Создать новый</a>
+    <a class="btn btn-primary" href="{{ path('course_new') }}">Создать новый</a>
 {% endblock %}
