@@ -6,17 +6,17 @@
 
     <h1>Курсы</h1>
 
-    {% for course in courses %}
-
-        <a href="{{ path('course_show', {'id': course.id}) }}">{{ course.name }}</a>
-        <div>{{ course.description }}</div>
-        <hr>
-
-    {% else %}
-        <tr>
-            <td colspan="5">Курсов не найдено</td>
-        </tr>
-    {% endfor %}
+    <div id="courses">
+        {% for course in courses %}
+            <div>
+                <a href="{{ path('course_show', {'id': course.id}) }}">{{ course.name }}</a>
+                <div>{{ course.description }}</div>
+                <hr>
+            </div>
+        {% else %}
+            <div>Курсов не найдено</div>
+        {% endfor %}
+    </div>
     <br>
     <a class="btn btn-primary" href="{{ path('course_new') }}">Создать новый</a>
 {% endblock %}

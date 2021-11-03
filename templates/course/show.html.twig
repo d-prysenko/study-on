@@ -6,12 +6,14 @@
     <h1>Курс "{{ course.name }}"</h1>
     <div>
         {{ course.description }}
-    </div><br>
+    </div>
+    <br>
 
-    {% for lesson in lessons %}
-        <div><a href="{{ path('lesson_show', {'id': lesson.id}) }}">{{ loop.index }}. {{ lesson.title }}</a></div>
-    {% endfor %}
-
+    <div id="lessons">
+        {% for lesson in lessons %}
+            <div><a href="{{ path('lesson_show', {'id': lesson.id}) }}">{{ loop.index }}. {{ lesson.title }}</a></div>
+        {% endfor %}
+    </div>
     <br>
     <a class="btn btn-outline-secondary" href="{{ path('course_index') }}">Назад</a>
     <a class="btn btn-outline-success" href="{{ path('lesson_new', {'course': course.id}) }}">Добавить урок</a>

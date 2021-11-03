@@ -18,28 +18,28 @@ class Lesson
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Course::class)
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $course;
+    private Course $course;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $title;
+    private string $title;
 
     /**
      * @ORM\Column(type="text")
      */
-    private $content;
+    private string $content;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $serial_number;
+    private int $serial_number;
 
     public function getId(): ?int
     {

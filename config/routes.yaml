@@ -57,5 +57,3 @@ lesson_delete:
   path:       /lesson/{id}
   controller: App\Controller\LessonController::delete
   methods:    POST
-
-
