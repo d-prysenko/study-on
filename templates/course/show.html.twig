@@ -16,7 +16,7 @@
     </div>
     <br>
     <a class="btn btn-outline-secondary" href="{{ path('course_index') }}">Назад</a>
-    <a class="btn btn-outline-success" href="{{ path('lesson_new', {'course': course.id}) }}">Добавить урок</a>
+    <a class="btn btn-outline-success" id="create_lesson" href="{{ path('lesson_new', {'course': course.id}) }}">Добавить урок</a>
     <a class="btn btn-outline-danger" href="{{ path('course_edit', {'id': course.id}) }}">Редактировать этот курс</a>
     {{ include('course/_delete_form.html.twig') }}
 {% endblock %}

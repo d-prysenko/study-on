@@ -13,10 +13,11 @@
                 <div>{{ course.description }}</div>
                 <hr>
             </div>
-        {% else %}
-            <div>Курсов не найдено</div>
         {% endfor %}
     </div>
+    {% if courses|length == 0 %}
+        <div>Курсов не найдено</div>
+    {% endif %}
     <br>
-    <a class="btn btn-primary" href="{{ path('course_new') }}">Создать новый</a>
+    <a id="create_course" class="btn btn-primary" href="{{ path('course_new') }}">Создать новый</a>
 {% endblock %}
