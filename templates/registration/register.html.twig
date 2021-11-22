@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    <h1>Регистрация</h1>
+
+    {% if error %}
+        <div class="text-danger">{{ error }}</div>
+    {% endif %}
+    {{ form_start(registrationForm) }}
+        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.password.first) }}
+        {{ form_row(registrationForm.password.second) }}
+
+        <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+    {{ form_end(registrationForm) }}
+{% endblock %}

@@ -16,15 +16,55 @@
 
     <body>
 
+
     <header class="p-3 bg-dark text-white">
         <div class="container">
-            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <h4 href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    StudyOn
-                </h4>
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
+                <a href="/" class="d-flex text-white align-items-center text-decoration-none">
+                    <h4 class="mb-0 mb-lg-0">StudyOn</h4>
+                </a>
+
+                <div class="col-md-3 text-end">
+                    {% if app.user %}
+                        <ul class="navbar-nav mb-2 mb-lg-0">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-white dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Аккаунт
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li><h6 class="dropdown-header">{{ app.user.email }}</h6></li>
+                                    <li><a class="dropdown-item" href="{{ path('profile') }}">Профиль</a></li>
+
+
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_logout') }}">Выйти</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+{#                        <a style="color: white; text-decoration: none;" href="{{ path('profile') }}">Профиль</a>#}
+{#                        <a style="color: white;" href="{{ path('app_logout') }}">Выйти</a>#}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </header>
+
+
+
+{#    <header class="p-3 bg-dark text-white">#}
+{#        <div class="container">#}
+{#            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">#}
+{#                <h4 href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">#}
+{#                    StudyOn#}
+{#                </h4>#}
+{#            </div>#}
+{#        </div>#}
+{#        {% if app.user %}#}
+{#            <div class="col-md-3 text-end">#}
+{#                <a href="{{ path('app_logout') }}">Logout</a>#}
+{#            </div>#}
+{#        {% endif %}#}
+{#    </header>#}
 
     <div class="mt-4 w-75 container">
         {% block body %}{% endblock %}

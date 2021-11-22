@@ -19,5 +19,7 @@
         <div>Курсов не найдено</div>
     {% endif %}
     <br>
-    <a id="create_course" class="btn btn-primary" href="{{ path('course_new') }}">Создать новый</a>
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+        <a id="create_course" class="btn btn-primary" href="{{ path('course_new') }}">Создать новый</a>
+    {% endif %}
 {% endblock %}

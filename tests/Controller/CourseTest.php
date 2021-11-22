@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Controller;
 
 use App\DataFixtures\CourseFixtures;
 use App\Entity\Course;
 use App\Entity\Lesson;
-use App\Repository\CourseRepository;
-use Symfony\Component\HttpFoundation\Response;
+use App\Tests\AbstractTest;
 
 class CourseTest extends AbstractTest
 {
@@ -17,7 +16,7 @@ class CourseTest extends AbstractTest
 
     public function testCoursesAndLessonsPages(): void
     {
-        $client = AbstractTest::getClient();
+        $client = static::getClient();
         $em = self::getEntityManager();
         $lessonRep = $em->getRepository(Lesson::class);
         $courseRep = $em->getRepository(Course::class);
@@ -50,9 +49,9 @@ class CourseTest extends AbstractTest
         $this->assertEquals($dbLessonsCount, $lessonsCount);
     }
 
-    public function testUniqueCourseCreation()
+    public function testUniqueCourseCreation(): void
     {
-        $client = AbstractTest::getClient();
+        $client = static::getClient();
 
         $crawler = $client->request('GET', '/courses');
 
@@ -72,9 +71,12 @@ class CourseTest extends AbstractTest
         $this->assertResponseCode(422, $client->getResponse());
     }
 
-    public function testCreationCourseAndLesson()
+    public function testCreationCourse(): void
     {
-        $client = AbstractTest::getClient();
+        // TODO: rename  all such pieces
+        // TODO: separate tests
+        // codecoverage, metrics, code quality, tdd
+        $client = static::getClient();
 
         $crawler = $client->request('GET', '/courses');
 
@@ -96,44 +98,9 @@ class CourseTest extends AbstractTest
 
         // this must redirect us to /courses page
         $this->assertResponseRedirect();
-        $client->followRedirect();
-
-        $crawler = $client->getCrawler();
-
-        // selecting our new course
-        $courseLink = $crawler->selectLink($courseName)->link();
-        $crawler = $client->click($courseLink);
-
-        $this->assertResponseOk();
-
-        // creating lesson in this course
-        $createLessonLink = $crawler->filter('#create_lesson')->link();
-        $crawler = $client->click($createLessonLink);
-
-        $this->assertResponseOk();
-
-        // create lesson form
-        $form = $crawler->filter('#lesson_form')->form();
-
-        $lessonTitle = 'This is new lesson!';
-
-        $form->setValues([
-            'lesson[title]' => $lessonTitle,
-            'lesson[content]' => 'content of the lesson',
-            'lesson[serial_number]' => 1
-        ]);
-
-        $client->submit($form);
-
-        $this->assertResponseRedirect();
-        $crawler = $client->followRedirect();
-
-        $lessonsCount = $crawler->filter('#lessons')->children()->count();
-
-        $this->assertEquals(1, $lessonsCount);
     }
 
-    public function testDeleteCourse()
+    public function testDeleteCourse(): void
     {
         $client = AbstractTest::getClient();
 
@@ -149,13 +116,11 @@ class CourseTest extends AbstractTest
     }
 
 
-    public function testPageIsNotFound()
+    public function testPageIsNotFound(): void
     {
         $client = AbstractTest::getClient();
         $client->request('GET', '/not-found');
 
         $this->assertResponseNotFound();
     }
-
-
 }

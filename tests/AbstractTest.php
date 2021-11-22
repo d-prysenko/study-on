@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
+use App\Tests\Mock\BillingClientMock;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Panther\Client;
+use App\Service\BillingClient;
 
 abstract class AbstractTest extends WebTestCase
 {
@@ -25,8 +27,15 @@ abstract class AbstractTest extends WebTestCase
             static::$client = static::createClient($options, $server);
         }
 
+        static::$client->disableReboot();
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            new BillingClientMock()
+        );
+
         // core is loaded (for tests without calling of getClient(true))
         static::$client->getKernel()->boot();
+
 
         return static::$client;
     }
