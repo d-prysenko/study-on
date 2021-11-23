@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Exception\BillingUserAlreadyExists;
 use App\Security\User;
 use App\Exception\BillingUnavailableException;
-use Cassandra\Exception\AlreadyExistsException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -19,12 +19,11 @@ class BillingClient
     }
 
     /**
-     * @throws BillingUnavailableException
+     * @throws ServiceUnavailableHttpException
      * @throws \JsonException
      */
     public function authenticate(string $jsonCredentials): string
     {
-        //$data = json_encode(['username' => $user->getUserIdentifier(), 'password' => $user->getPassword()]);
         $response = $this->jsonRequest('/api/v1/auth', CURLOPT_POST, $jsonCredentials);
 
         if (isset($response['token'])) {
@@ -35,7 +34,8 @@ class BillingClient
     }
 
     /**
-     * @throws BillingUnavailableException
+     * @throws ServiceUnavailableHttpException
+     * @throws BillingUserAlreadyExists
      * @throws \JsonException
      * @throws \Exception
      */
@@ -56,7 +56,7 @@ class BillingClient
     }
 
     /**
-     * @throws BillingUnavailableException
+     * @throws ServiceUnavailableHttpException
      * @throws \JsonException
      */
     public function getUser(string $apiToken): User
@@ -68,7 +68,6 @@ class BillingClient
             $user->setEmail($response['username']);
             $user->setRoles($response['roles']);
             $user->setBalance($response['balance']);
-//            dd($response);
             return $user;
         }
 
@@ -77,7 +76,7 @@ class BillingClient
 
     /**
      * @param int $method CURLOPT_<method>
-     * @throws BillingUnavailableException
+     * @throws ServiceUnavailableHttpException
      * @throws \JsonException
      */
     public function jsonRequest(string $urn, int $method, string $jsonPayload = null, string $apiToken = null): array
@@ -104,7 +103,7 @@ class BillingClient
         curl_close($curl);
 
         if (curl_error($curl)) {
-            throw new BillingUnavailableException();
+            throw new ServiceUnavailableHttpException();
         }
 
         return $resp;

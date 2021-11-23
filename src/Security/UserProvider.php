@@ -39,14 +39,8 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
         // The $identifier argument may not actually be a username:
         // it is whatever value is being returned by the getUserIdentifier()
         // method in your User class.
-//        throw new \Exception('TODO:'.$identifier.' fill in loadUserByIdentifier() inside '.__FILE__);
 
-
-        try {
-            $token = $this->billingClient->authenticate($identifier);
-        } catch (BillingUnavailableException $ex) {
-            throw new ServiceUnavailableHttpException();
-        }
+        $token = $this->billingClient->authenticate($identifier);
 
         $userInfo = $this->JWTManager->parse($token);
 
