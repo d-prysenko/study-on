@@ -44,7 +44,6 @@ class RegistrationController extends AbstractController
                 $form->get('email')->addError(new FormError('Пользователь с таким email уже существует'));
             }
             catch (\JsonException | \Exception $e) {
-                //dd($e);
                 $error = $e->getMessage();
             }
         }

@@ -26,6 +26,7 @@ class CourseTest extends AbstractTest
 
         // /courses page load
         $this->assertResponseOk();
+        //dd($client->getResponse());
 
         $coursesCount = $crawler->filter('#courses')->children()->count();
         $dbCoursesCount = $courseRep->count([]);
@@ -48,6 +49,7 @@ class CourseTest extends AbstractTest
         // count of lessons on course page
         $this->assertEquals($dbLessonsCount, $lessonsCount);
     }
+
 
     public function testUniqueCourseCreation(): void
     {
@@ -73,9 +75,6 @@ class CourseTest extends AbstractTest
 
     public function testCreationCourse(): void
     {
-        // TODO: rename  all such pieces
-        // TODO: separate tests
-        // codecoverage, metrics, code quality, tdd
         $client = static::getClient();
 
         $crawler = $client->request('GET', '/courses');
@@ -102,7 +101,7 @@ class CourseTest extends AbstractTest
 
     public function testDeleteCourse(): void
     {
-        $client = AbstractTest::getClient();
+        $client = static::getClient();
 
         $crawler = $client->request('GET', '/courses');
 
@@ -110,15 +109,23 @@ class CourseTest extends AbstractTest
         $coursesCount = $courses->count();
         $courseLink = $courses->first()->filter('a')->link();
 
-        $client->click($courseLink);
+        $crawler = $client->click($courseLink);
+        $deleteCourseButton = $crawler->selectButton("Удалить")->form();
 
-        // TODO: click delete button and compare courses count
+        $client->click($deleteCourseButton);
+
+        $this->assertResponseRedirect();
+        $crawler = $client->followRedirect();
+
+        $coursesCount = $crawler->filter('#courses')->children()->count();
+
+        $this->assertEquals(1, $coursesCount);
     }
 
 
     public function testPageIsNotFound(): void
     {
-        $client = AbstractTest::getClient();
+        $client = static::getClient();
         $client->request('GET', '/not-found');
 
         $this->assertResponseNotFound();

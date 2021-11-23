@@ -26,7 +26,7 @@ class LessonType extends AbstractType
         $builder
             ->add('title', \Symfony\Component\Form\Extension\Core\Type\TextType::class)
             ->add('content', TextareaType::class)
-            ->add('serial_number')
+            ->add('serialNumber')
             ->add('course', HiddenType::class);
 
         $builder->get('course')

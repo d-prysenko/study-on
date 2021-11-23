@@ -3,6 +3,8 @@
 namespace App\Tests\Controller;
 
 use App\DataFixtures\CourseFixtures;
+use App\Entity\Course;
+use App\Entity\Lesson;
 use App\Tests\AbstractTest;
 
 class LessonTest extends AbstractTest
@@ -14,8 +16,6 @@ class LessonTest extends AbstractTest
 
     public function testCreationLesson(): void
     {
-        // TODO: rename  all such pieces
-        // TODO: separate tests
         // codecoverage, metrics, code quality, tdd
         $client = static::getClient();
 
@@ -24,7 +24,6 @@ class LessonTest extends AbstractTest
         // selecting our new course
         $courseLink = $crawler->selectLink("Базы данных")->link();
         $crawler = $client->click($courseLink);
-
         $this->assertResponseOk();
 
         // creating lesson in this course
@@ -41,7 +40,7 @@ class LessonTest extends AbstractTest
         $form->setValues([
             'lesson[title]' => $lessonTitle,
             'lesson[content]' => 'content of the lesson',
-            'lesson[serial_number]' => 1
+            'lesson[serialNumber]' => 1
         ]);
 
         $client->submit($form);
@@ -51,6 +50,54 @@ class LessonTest extends AbstractTest
 
         $lessonsCount = $crawler->filter('#lessons')->children()->count();
 
-        $this->assertEquals(1, $lessonsCount);
+        $this->assertEquals(3, $lessonsCount);
+    }
+
+    public function testDeleteLesson(): void
+    {
+        $client = static::getClient();
+
+        $em = self::getEntityManager();
+        $lessonRep = $em->getRepository(Lesson::class);
+        $courseRep = $em->getRepository(Course::class);
+        $url = "/courses";
+
+        $crawler = $client->request('GET', $url);
+
+        // /courses page load
+        $this->assertResponseOk();
+        //dd($client->getResponse());
+
+        $coursesCount = $crawler->filter('#courses')->children()->count();
+        $dbCoursesCount = $courseRep->count([]);
+
+        // count of courses on main page
+        // $this->assertEquals(min($dbCoursesCount, COUNT_COURSES_ON_PAGE_LIMIT), $coursesCount);
+        $this->assertEquals($dbCoursesCount, $coursesCount);
+
+        $course = $courseRep->findOneBy([]);
+        $link = $crawler->selectLink($course->getName())->link();
+        $crawler = $client->click($link);
+
+        // loading page of some course
+        $this->assertResponseOk();
+
+        $lessons = $crawler->filter('#lessons')->children();
+        $oldLessonsCount = $lessons->count();
+
+        $lessonLink = $lessons->first()->children()->link();
+        $crawler = $client->click($lessonLink);
+
+        $deleteLessonButton = $crawler->selectButton("Удалить")->form();
+
+        $client->click($deleteLessonButton);
+
+        $this->assertResponseRedirect();
+        $crawler = $client->followRedirect();
+
+        $lessonsCount = $crawler->filter('#lessons')->children()->count();
+
+        $this->assertEquals($oldLessonsCount - 1, $lessonsCount);
+
     }
 }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests;
 
+use App\Security\User;
 use App\Tests\Mock\BillingClientMock;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -19,7 +21,7 @@ use App\Service\BillingClient;
 abstract class AbstractTest extends WebTestCase
 {
     /** @var Client */
-    protected static $client;
+    protected static ?KernelBrowser $client = null;
 
     protected static function getClient($reinitialize = false, array $options = [], array $server = [])
     {
@@ -27,15 +29,23 @@ abstract class AbstractTest extends WebTestCase
             static::$client = static::createClient($options, $server);
         }
 
-        static::$client->disableReboot();
-        static::$client->getContainer()->set(
-            BillingClient::class,
-            new BillingClientMock()
-        );
+//        static::$client->disableReboot();
 
         // core is loaded (for tests without calling of getClient(true))
         static::$client->getKernel()->boot();
 
+//        static::$client->getContainer()->set(
+//            BillingClient::class,
+//            new BillingClientMock()
+//        );
+
+        $user = new User();
+        $user->setEmail('admin@test.ru');
+        $user->setPassword('password');
+        $user->setRoles(['ROLE_SUPER_ADMIN', 'ROLE_USER']);
+        $user->setBalance(100.0);
+
+        static::$client->loginUser($user);
 
         return static::$client;
     }
@@ -45,9 +55,6 @@ abstract class AbstractTest extends WebTestCase
         static::getClient();
         self::bootKernel();
 
-//        $this->entityManager = $kernel->getContainer()
-//            ->get('doctrine')
-//            ->getManager();
         $this->loadFixtures($this->getFixtures());
     }
 
