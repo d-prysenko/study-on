@@ -7,6 +7,7 @@ use App\Exception\BillingUserAlreadyExists;
 use App\Security\BillingAuthenticator;
 use App\Security\User;
 use App\Form\RegistrationFormType;
+use App\Service\BillingAuthenticationManager;
 use App\Service\BillingClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -16,10 +17,13 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 
 class RegistrationController extends AbstractController
 {
-    public function register(Request $request, UserAuthenticatorInterface $authenticator, BillingAuthenticator $formAuthenticator, BillingClient $billingClient): Response
+    public function register(Request $request, BillingAuthenticationManager $authenticator, BillingAuthenticator $formAuthenticator, BillingClient $billingClient): Response
     {
 //        if ($this->isGranted('ROLE_USER'))
 //        {
@@ -37,13 +41,10 @@ class RegistrationController extends AbstractController
                 $billingClient->register($user);
                 return $authenticator->authenticateUser($user, $formAuthenticator, $request);
             }
-            catch (BillingUnavailableException $e) {
-                throw new ServiceUnavailableHttpException();
-            }
             catch (BillingUserAlreadyExists $e) {
                 $form->get('email')->addError(new FormError('Пользователь с таким email уже существует'));
             }
-            catch (\JsonException | \Exception $e) {
+            catch (\Exception $e) {
                 $error = $e->getMessage();
             }
         }

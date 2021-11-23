@@ -45,6 +45,7 @@ class BillingClient
         $response = $this->jsonRequest('/api/v1/register', CURLOPT_POST, $data);
 
         if (isset($response['token'])) {
+            $user->setApiToken($response['token']);
             return $response['token'];
         }
 
