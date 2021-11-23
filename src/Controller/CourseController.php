@@ -42,7 +42,7 @@ class CourseController extends AbstractController
     public function show(Course $course): Response
     {
         $lessonRep = $this->getDoctrine()->getRepository(Lesson::class);
-        $lessons = $lessonRep->findBy(array('course' => $course->getId()), array('serial_number' => 'ASC'));
+        $lessons = $lessonRep->findBy(array('course' => $course->getId()), array('serialNumber' => 'ASC'));
 
         return $this->render('course/show.html.twig', [
             'course' => $course,

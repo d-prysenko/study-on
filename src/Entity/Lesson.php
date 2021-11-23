@@ -36,10 +36,11 @@ class Lesson
      */
     private string $content;
 
+    // TODO: rename to $serialNumber
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", name="serial_number")
      */
-    private int $serial_number;
+    private int $serialNumber;
 
     public function getId(): ?int
     {
@@ -84,12 +85,12 @@ class Lesson
 
     public function getSerialNumber(): ?int
     {
-        return $this->serial_number;
+        return $this->serialNumber;
     }
 
-    public function setSerialNumber(int $serial_number): self
+    public function setSerialNumber(int $serialNumber): self
     {
-        $this->serial_number = $serial_number;
+        $this->serialNumber = $serialNumber;
 
         return $this;
     }
@@ -97,7 +98,7 @@ class Lesson
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint(
-            'serial_number',
+            'serialNumber',
             new LessThanOrEqual(['value' => 10000, 'message' => 'The serial number must be less than 10000'])
         );
         $metadata->addPropertyConstraint('course', new Assert\NotNull(['message' => 'course must be not null']));
