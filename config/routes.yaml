@@ -4,12 +4,12 @@
 
 app_login:
   path:       /login
-  controller: App\Controller\SecurityController::login
+  controller: App\Controller\AuthenticationController::login
   methods:    GET|POST
 
 app_logout:
   path:       /logout
-  controller: App\Controller\SecurityController::logout
+  controller: App\Controller\AuthenticationController::logout
 
 app_register:
   path:       /register
