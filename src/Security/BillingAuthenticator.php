@@ -37,12 +37,10 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
     public const LOGIN_ROUTE = 'app_login';
 
     private UrlGeneratorInterface $urlGenerator;
-    private JWTTokenManagerInterface $JWTManager;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, JWTTokenManagerInterface $JWTManager)
+    public function __construct(UrlGeneratorInterface $urlGenerator)
     {
         $this->urlGenerator = $urlGenerator;
-        $this->JWTManager = $JWTManager;
     }
 
     public function authenticate(Request $request): PassportInterface
@@ -56,7 +54,7 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
 
         return new SelfValidatingPassport(
             // calls App\Security\UserProvider::loadUserByIdentifier
-            new UserBadge(json_encode($credentials)),
+            new UserBadge(json_encode($credentials, JSON_THROW_ON_ERROR)),
             [
                 new CsrfTokenBadge('authenticate', $request->get('_csrf_token')),
                 new RememberMeBadge()

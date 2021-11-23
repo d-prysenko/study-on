@@ -10,16 +10,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class AuthenticationController extends AbstractController
 {
-
-//    public function register(): Response
-//    {
-//        $user = new User();
-//        $form = $this->createForm(UserType::class, $user);
-//        return $this->renderForm('security/register.html.twig', [
-//            'form' => $form,
-//        ]);
-//    }
-
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
 //        if ($this->isGranted('ROLE_USER'))
