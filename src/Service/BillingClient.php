@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Exception\BillingUserAlreadyExists;
 use App\Security\User;
 use App\Exception\BillingUnavailableException;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -12,22 +13,27 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class BillingClient
 {
     private string $billingUrl;
+    private JWTTokenManagerInterface $JWTManager;
 
-    public function __construct()
+    public function __construct(JWTTokenManagerInterface $JWTManager)
     {
         $this->billingUrl = $_ENV['BILLING_URL'];
+        $this->JWTManager = $JWTManager;
     }
 
     /**
      * @throws ServiceUnavailableHttpException
      * @throws \JsonException
      */
-    public function authenticate(string $jsonCredentials): string
+    public function authenticate(string $jsonCredentials): User
     {
         $response = $this->jsonRequest('/api/v1/auth', CURLOPT_POST, $jsonCredentials);
 
-        if (isset($response['token'])) {
-            return $response['token'];
+        if (isset($response['token'], $response['refresh_token'])) {
+//            return $response['token'];
+            $user = $this->userFromToken($response['token']);
+            $user->setRefreshToken($response['refresh_token']);
+            return $user;
         }
 
         throw new CustomUserMessageAuthenticationException($response['message'] ?? "Unknown error");
@@ -39,14 +45,15 @@ class BillingClient
      * @throws \JsonException
      * @throws \Exception
      */
-    public function register(User $user): string
+    public function register(User $user): User
     {
         $data = json_encode(['username' => $user->getEmail(), 'password' => $user->getPassword()], JSON_THROW_ON_ERROR);
         $response = $this->jsonRequest('/api/v1/register', CURLOPT_POST, $data);
 
-        if (isset($response['token'])) {
-            $user->setApiToken($response['token']);
-            return $response['token'];
+        if (isset($response['token'], $response['refresh_token'])) {
+            $user = $this->userFromToken($response['token']);
+            $user->setRefreshToken($response['refresh_token']);
+            return $user;
         }
 
         if (isset($response['message']) && $response['message'] === "Email already in use!") {
@@ -56,9 +63,24 @@ class BillingClient
         throw new \Exception($response['message'] ?? "Unknown error");
     }
 
+    public function userFromToken(string $apiToken): User
+    {
+        $user = new User();
+
+        $userInfo = $this->JWTManager->parse($apiToken);
+
+        $user->setApiToken($apiToken);
+
+        $user->setEmail($userInfo['username']);
+        $user->setRoles($userInfo['roles']);
+
+        return $user;
+    }
+
     /**
      * @throws ServiceUnavailableHttpException
      * @throws \JsonException
+     * @throws \Exception
      */
     public function getUser(string $apiToken): User
     {

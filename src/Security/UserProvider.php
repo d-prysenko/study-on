@@ -40,15 +40,16 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
         // it is whatever value is being returned by the getUserIdentifier()
         // method in your User class.
 
-        $token = $this->billingClient->authenticate($identifier);
+//        $token = $this->billingClient->authenticate($identifier);
 
-        $userInfo = $this->JWTManager->parse($token);
+//        $userInfo = $this->JWTManager->parse($token);
+//
+//        $user = new User();
+//        $user->setApiToken($token);
+//        $user->setEmail($userInfo['username']);
+//        $user->setRoles($userInfo['roles']);
 
-        $user = new User();
-        $user->setApiToken($token);
-        $user->setEmail($userInfo['username']);
-        $user->setRoles($userInfo['roles']);
-        return $user;
+        return $this->billingClient->authenticate($identifier);
     }
 
     /**
@@ -77,6 +78,9 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
         }
+
+        $refreshedUser = new User();
+
 
         // TODO: query to api
 //        try {

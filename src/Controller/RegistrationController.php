@@ -13,17 +13,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 
 class RegistrationController extends AbstractController
 {
-    public function register(Request $request, BillingAuthenticationManager $authenticator, BillingAuthenticator $formAuthenticator, BillingClient $billingClient): Response
+    public function register(Request $request, BillingAuthenticationManager $authenticator, BillingAuthenticator $billingAuthenticator, BillingClient $billingClient): Response
     {
 //        if ($this->isGranted('ROLE_USER'))
 //        {
@@ -38,8 +31,9 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $billingClient->register($user);
-                return $authenticator->authenticateUser($user, $formAuthenticator, $request);
+                // calls /api/v1/register via curl
+                $user = $billingClient->register($user);
+                return $authenticator->authenticateUser($user, $billingAuthenticator, $request);
             }
             catch (BillingUserAlreadyExists $e) {
                 $form->get('email')->addError(new FormError('Пользователь с таким email уже существует'));
