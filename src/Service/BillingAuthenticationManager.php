@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Security\Passport\AuthenticatedUserPassport;
 use App\Security\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -33,15 +34,13 @@ class BillingAuthenticationManager implements AuthenticatorManagerInterface, Use
     private TokenStorageInterface $tokenStorage;
     private EventDispatcherInterface $eventDispatcher;
     private string $firewallName;
-    private JWTTokenManagerInterface $JWTManager;
 
 
-    public function __construct(JWTTokenManagerInterface $JWTManager, TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName = 'main')
+    public function __construct(TokenStorageInterface $tokenStorage, EventDispatcherInterface $eventDispatcher, string $firewallName = 'main')
     {
         $this->tokenStorage = $tokenStorage;
         $this->eventDispatcher = $eventDispatcher;
         $this->firewallName = $firewallName;
-        $this->JWTManager = $JWTManager;
     }
 
     /**
@@ -49,25 +48,17 @@ class BillingAuthenticationManager implements AuthenticatorManagerInterface, Use
      */
     public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = []): ?Response
     {
-        $passport =  new SelfValidatingPassport(
-            new UserBadge(
-                $user->getUserIdentifier(),
-                function (string $apiToken) {
-                    $userInfo = $this->JWTManager->parse($apiToken);
-
-                    $user = new User();
-                    $user->setApiToken($apiToken);
-                    $user->setEmail($userInfo['username']);
-                    $user->setRoles($userInfo['roles']);
-                    return $user;
-                }
-            ),
+        // custom passport
+        $passport = new AuthenticatedUserPassport(
+            $user,
             [
                 new CsrfTokenBadge('authenticate', $request->get('_csrf_token')),
                 new RememberMeBadge()
             ]
         );
 
+        // calls AbstractAuthenticator::createAuthenticatedToken(PassportInterface, string)
+        // and accesses to user by PassportInterface::getUser()
         $token = $authenticator->createAuthenticatedToken($passport, $this->firewallName);
 
         // announce the authenticated token
