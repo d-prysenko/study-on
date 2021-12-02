@@ -24,6 +24,10 @@ fixtload:
 require:
 	@${COMPOSER} require $2
 
+encore_install:
+	${COMPOSE} run node yarn install
+	${COMPOSE} run node yarn add @symfony/webpack-encore --dev
+
 encore_dev:
 	@${COMPOSE} run node yarn encore dev
 
@@ -41,4 +45,4 @@ env_create:
 composer_install:
 	${COMPOSER} install
 
-install: env_create up composer_install encore_dev
+install: env_create up composer_install encore_install encore_dev
