@@ -109,9 +109,11 @@ class User implements UserInterface
     /**
      * @param string $apiToken
      */
-    public function setApiToken(string $apiToken): void
+    public function setApiToken(string $apiToken): self
     {
         $this->apiToken = $apiToken;
+
+        return $this;
     }
 
     /**
@@ -125,17 +127,21 @@ class User implements UserInterface
     /**
      * @param float $balance
      */
-    public function setBalance(float $balance): void
+    public function setBalance(float $balance): self
     {
         $this->balance = $balance;
+
+        return $this;
     }
 
     /**
      * @param string $password
      */
-    public function setPassword(string $password): void
+    public function setPassword(string $password): self
     {
         $this->password = $password;
+
+        return $this;
     }
 
     /**
@@ -149,8 +155,10 @@ class User implements UserInterface
     /**
      * @param string $refreshToken
      */
-    public function setRefreshToken(string $refreshToken): void
+    public function setRefreshToken(string $refreshToken): self
     {
         $this->refreshToken = $refreshToken;
+
+        return $this;
     }
 }

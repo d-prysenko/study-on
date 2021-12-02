@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Course index{% endblock %}
+{% block title %}Курсы{% endblock %}
 
 {% block body %}
 
@@ -11,10 +11,20 @@
                 <a href="{{ path('course_show', {'id': course.id}) }}">{{ course.name }}</a>
                 <div>{{ course.description }}</div>
                 {% if my_courses[course.code] is defined %}
-                    <div>Приобретено</div>
+                    <div>Приобретено
+                        {% if my_courses[course.code].type == 2 %}
+                             до {{ my_courses[course.code].expiration|date("d.m.Y") }}
+                        {% endif %}
+                    </div>
                 {% else %}
-                    <div>Стоимость: {{ course_info[course.code].cost }} руб.</div>
-                    <a href="{{ path('course_buy', {'id': course.id}) }}">Купить</a>
+                    <div >Стоимость: {{ course_info[course.code].cost }} руб.</div>
+                    <div class="row">
+                        <a class="col" href="{{ path('course_buy', {'id': course.id}) }}">Купить</a>
+                        {% if course_info[course.code].type == 2 %}
+                            <div class="col text-end">доступ к курсу будет предоставлен на {{ date_russian_format(course_info[course.code].duration) }}</div>
+                        {% endif %}
+                    </div>
+
                 {% endif %}
                 <hr>
             </div>

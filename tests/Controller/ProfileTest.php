@@ -20,7 +20,7 @@ class ProfileTest extends AbstractTest
 
         $billingClientMock = $this->createMock(BillingClient::class);
         $billingClientMock
-            ->method('getUser')
+            ->method('getCurrentUser')
             ->willReturn(static::$user);
 
         static::$client->getContainer()->set(

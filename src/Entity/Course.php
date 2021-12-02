@@ -141,8 +141,10 @@ class Course
     /**
      * @param \DateInterval $duration
      */
-    public function setDuration(\DateInterval $duration): void
+    public function setDuration(\DateInterval $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
     }
 }

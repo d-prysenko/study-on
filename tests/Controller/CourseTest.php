@@ -10,7 +10,7 @@ use App\Tests\AbstractTest;
 
 class CourseTest extends AbstractTest
 {
-    protected function getFixtures(): array
+        protected function getFixtures(): array
     {
         return [new CourseFixtures()];
     }
@@ -18,16 +18,23 @@ class CourseTest extends AbstractTest
     public function testCoursesAndLessonsPages(): void
     {
         $client = static::getClient(true);
-        $em = self::getEntityManager();
+
+        $billingClientMock = $this->createMock(BillingClient::class);
+        $billingClientMock
+            ->method('getCourses')
+            ->willReturn(static::$apiCoursesInfo);
+
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            $billingClientMock
+        );
+
+        $em = static::getEntityManager();
         $lessonRep = $em->getRepository(Lesson::class);
         $courseRep = $em->getRepository(Course::class);
-        $url = "/courses";
 
-        $crawler = $client->request('GET', $url);
-
-        // /courses page load
-        $this->assertResponseOk();
-        //dd($client->getResponse());
+        $crawler = $client->request('GET', "/courses");
+        $this->assertResponseCode(200, $client->getResponse());
 
         $coursesCount = $crawler->filter('#courses')->children()->count();
         $dbCoursesCount = $courseRep->count([]);
@@ -56,7 +63,18 @@ class CourseTest extends AbstractTest
     {
         $client = static::getClient(true);
 
+        $billingClientMock = $this->createMock(BillingClient::class);
+        $billingClientMock
+            ->method('getCourses')
+            ->willReturn(static::$apiCoursesInfo);
+
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            $billingClientMock
+        );
+
         $crawler = $client->request('GET', '/courses');
+        $this->assertResponseCode(200, $client->getResponse());
 
         $createCourseLink = $crawler->selectLink('Создать новый')->link();
         $crawler = $client->click($createCourseLink);
@@ -78,7 +96,18 @@ class CourseTest extends AbstractTest
     {
         $client = static::getClient(true);
 
+        $billingClientMock = $this->createMock(BillingClient::class);
+        $billingClientMock
+            ->method('getCourses')
+            ->willReturn(static::$apiCoursesInfo);
+
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            $billingClientMock
+        );
+
         $crawler = $client->request('GET', '/courses');
+        $this->assertResponseCode(200, $client->getResponse());
 
         // open course creation page
         $createCourseLink = $crawler->filter('#create_course')->link();
@@ -104,7 +133,18 @@ class CourseTest extends AbstractTest
     {
         $client = static::getClient(true);
 
+        $billingClientMock = $this->createMock(BillingClient::class);
+        $billingClientMock
+            ->method('getCourses')
+            ->willReturn(static::$apiCoursesInfo);
+
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            $billingClientMock
+        );
+
         $crawler = $client->request('GET', '/courses');
+        $this->assertResponseCode(200, $client->getResponse());
 
         $courses = $crawler->filter('#courses')->children();
         $coursesCount = $courses->count();

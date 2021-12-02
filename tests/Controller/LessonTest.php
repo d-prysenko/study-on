@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use App\DataFixtures\CourseFixtures;
 use App\Entity\Course;
 use App\Entity\Lesson;
+use App\Service\BillingClient;
 use App\Tests\AbstractTest;
 
 class LessonTest extends AbstractTest
@@ -19,7 +20,18 @@ class LessonTest extends AbstractTest
         // codecoverage, metrics, code quality, tdd
         $client = static::getClient(true);
 
+        $billingClientMock = $this->createMock(BillingClient::class);
+        $billingClientMock
+            ->method('getCourses')
+            ->willReturn(static::$apiCoursesInfo);
+
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            $billingClientMock
+        );
+
         $crawler = $client->request('GET', '/courses');
+        $this->assertResponseCode(200, $client->getResponse());
 
         // selecting our new course
         $courseLink = $crawler->selectLink("Базы данных")->link();
@@ -57,16 +69,24 @@ class LessonTest extends AbstractTest
     {
         $client = static::getClient(true);
 
+        $billingClientMock = $this->createMock(BillingClient::class);
+        $billingClientMock
+            ->method('getCourses')
+            ->willReturn(static::$apiCoursesInfo);
+
+        static::$client->getContainer()->set(
+            BillingClient::class,
+            $billingClientMock
+        );
+
         $em = self::getEntityManager();
         $lessonRep = $em->getRepository(Lesson::class);
         $courseRep = $em->getRepository(Course::class);
-        $url = "/courses";
 
-        $crawler = $client->request('GET', $url);
+        $crawler = $client->request('GET', "/courses");
 
         // /courses page load
         $this->assertResponseOk();
-        //dd($client->getResponse());
 
         $coursesCount = $crawler->filter('#courses')->children()->count();
         $dbCoursesCount = $courseRep->count([]);
@@ -98,6 +118,5 @@ class LessonTest extends AbstractTest
         $lessonsCount = $crawler->filter('#lessons')->children()->count();
 
         $this->assertEquals($oldLessonsCount - 1, $lessonsCount);
-
     }
 }

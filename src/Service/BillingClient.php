@@ -6,10 +6,10 @@ use App\Entity\Course;
 use App\Exception\BillingUserAlreadyExists;
 use App\Security\User;
 use App\Exception\BillingUnavailableException;
+use JsonException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -32,7 +32,7 @@ class BillingClient
 
     /**
      * @throws ServiceUnavailableHttpException
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function authenticate(string $jsonCredentials): User
     {
@@ -50,7 +50,7 @@ class BillingClient
     /**
      * @throws ServiceUnavailableHttpException
      * @throws BillingUserAlreadyExists
-     * @throws \JsonException
+     * @throws JsonException
      * @throws \Exception
      */
     public function register(User $user): User
@@ -73,14 +73,14 @@ class BillingClient
 
     /**
      * @throws ServiceUnavailableHttpException
-     * @throws \JsonException
+     * @throws JsonException
      * @throws \Exception
      */
     public function getCurrentUser(): User
     {
         $response = $this->jsonRequest('/api/v1/users/current', CURLOPT_HTTPGET, null, true);
 
-        if (isset($response['code']) && $response['code'] == 200) {
+        if (isset($response['code']) && $response['code'] === 200) {
             $user = new User();
             $user->setEmail($response['username']);
             $user->setRoles($response['roles']);
@@ -92,7 +92,8 @@ class BillingClient
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
+     * @throws \Exception
      */
     public function createCourse(Course $course): void
     {
@@ -104,22 +105,25 @@ class BillingClient
         ];
 
         if ($course->getType() === "rent") {
-            $data['duration'] = $course->getDuration();
+            $data['duration'] = $course->getDuration()->format("P%yY%mM%dD");
         }
 
         $jsonData = json_encode($data, JSON_THROW_ON_ERROR);
-        //dd($jsonData);
+
         $response = $this->jsonRequest('/api/v1/courses', CURLOPT_POST, $jsonData, true);
 
         if (!isset($response['code'])) {
             throw new \Exception($response['message'] ?? "Api service error");
         }
 
-        if ($response['code'] != 201) {
+        if ($response['code'] !== 201) {
             throw new \Exception($response['message']);
         }
     }
 
+    /**
+     * @throws JsonException
+     */
     public function editCourse(Course $course): array
     {
         $data = [
@@ -130,7 +134,7 @@ class BillingClient
         ];
 
         if ($course->getType() === "rent") {
-            $data['duration'] = $course->getDuration();
+            $data['duration'] = $course->getDuration()->format("P%yY%mM%dD");
         }
 
         $jsonData = json_encode($data, JSON_THROW_ON_ERROR);
@@ -144,6 +148,10 @@ class BillingClient
         return $response;
     }
 
+    /**
+     * @throws JsonException
+     * @throws \Exception
+     */
     public function deleteCourse(Course $course): void
     {
         $response = $this->jsonRequest("/api/v1/courses/{$course->getCode()}/delete", CURLOPT_POST, null, true);
@@ -152,11 +160,14 @@ class BillingClient
             throw new ServiceUnavailableHttpException();
         }
 
-        if ($response['code'] != 200 && isset($response['message'])) {
+        if ($response['code'] !== 200 && isset($response['message'])) {
             throw new \Exception($response['message']);
         }
     }
 
+    /**
+     * @throws JsonException
+     */
     public function getCourses(bool $assoc = false): array
     {
         $response = json_decode($this->request('/api/v1/courses', CURLOPT_HTTPGET), true, 512, JSON_THROW_ON_ERROR);
@@ -171,6 +182,9 @@ class BillingClient
         return $response;
     }
 
+    /**
+     * @throws JsonException
+     */
     public function buyCourse(string $code): array
     {
         $response = $this->jsonRequest("/api/v1/courses/$code/buy", CURLOPT_POST, null, true);
@@ -182,6 +196,9 @@ class BillingClient
         return $response;
     }
 
+    /**
+     * @throws JsonException
+     */
     public function getUserCourses(bool $assoc = false): array
     {
         $response = $this->jsonRequest('/api/v1/me/courses', CURLOPT_HTTPGET, null, true);
@@ -205,7 +222,7 @@ class BillingClient
 
             $user->setApiToken($response['token']);
             $user->setRefreshToken($response['refresh_token']);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
         }
 
         return $user;
@@ -232,7 +249,7 @@ class BillingClient
     /**
      * @param int $method CURLOPT_<method>
      * @throws ServiceUnavailableHttpException
-     * @throws \JsonException
+     * @throws JsonException
      */
     private function jsonRequest(
         string $urn,
@@ -264,10 +281,11 @@ class BillingClient
 
         $resp = curl_exec($curl);
 
+        $e = curl_error($curl);
         curl_close($curl);
 
-        if (curl_error($curl)) {
-            throw new ServiceUnavailableHttpException();
+        if ($e) {
+            throw new ServiceUnavailableHttpException(3, $e);
         }
 
         return $resp;
@@ -275,15 +293,12 @@ class BillingClient
 
     private function userFromToken(string $apiToken): User
     {
-        $user = new User();
-
         $userInfo = $this->JWTManager->parse($apiToken);
 
-        $user->setApiToken($apiToken);
-
-        $user->setEmail($userInfo['username']);
-        $user->setRoles($userInfo['roles']);
-
-        return $user;
+        return (new User())
+            ->setApiToken($apiToken)
+            ->setEmail($userInfo['username'])
+            ->setRoles($userInfo['roles'])
+        ;
     }
 }

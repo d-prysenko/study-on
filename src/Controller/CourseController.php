@@ -16,6 +16,8 @@ class CourseController extends AbstractController
 {
     public function index(CourseRepository $courseRepository, BillingClient $billingClient): Response
     {
+//        echo var_export($billingClient->getCourses(true));
+//        die();
         return $this->render('course/index.html.twig', [
             'courses' => $courseRepository->findAll(),
             'course_info' => $billingClient->getCourses(true),

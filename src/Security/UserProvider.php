@@ -71,16 +71,16 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
         }
 
-        try {
-            $tokenData = $this->JWTManager->parse($user->getApiToken());
-        } catch (JWTDecodeFailureException $ex) {
-            throw new ExpiredTokenException();
-        }
-        $remainingTime = $tokenData['exp'] - $tokenData['iat'];
-
-        if ($remainingTime < 60) {
-            $this->billingClient->refreshUser($user);
-        }
+//        try {
+//            $tokenData = $this->JWTManager->parse($user->getApiToken());
+//        } catch (JWTDecodeFailureException $ex) {
+//            throw new ExpiredTokenException();
+//        }
+//        $remainingTime = $tokenData['exp'] - $tokenData['iat'];
+//
+//        if ($remainingTime < 60) {
+//            $this->billingClient->refreshUser($user);
+//        }
 
         return $user;
     }

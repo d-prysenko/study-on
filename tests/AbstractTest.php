@@ -19,9 +19,14 @@ use App\Service\BillingClient;
 
 abstract class AbstractTest extends WebTestCase
 {
-    /** @var Client */
+
     protected static ?KernelBrowser $client = null;
     protected static User $user;
+
+    protected static array $apiCoursesInfo = [
+        'math' => [ 'id' => 0, 'code' => 'math', 'type' => 0, 'cost' => 50, 'name' => 'Алгебра', 'duration' => null, ],
+        'db' => [ 'id' => 1, 'code' => 'db', 'type' => 0, 'cost' => 100, 'name' => 'Базы данных', 'duration' => null, ],
+    ];
 
     protected static function getClient(bool $isShouldLogin = false, array $roles = ['ROLE_SUPER_ADMIN', 'ROLE_USER'], bool $reinitialize = false, array $options = [], array $server = [])
     {
@@ -33,12 +38,12 @@ abstract class AbstractTest extends WebTestCase
         // core is loaded (for tests without calling of getClient(true))
         static::$client->getKernel()->boot();
 
-        static::$user = new User();
-        static::$user->setEmail('admin@test.ru');
-        static::$user->setPassword('password');
-        static::$user->setRoles($roles);
-        static::$user->setBalance(100.0);
-
+        static::$user = (new User())
+            ->setEmail('super_admin@email.com')
+            ->setPassword('plain_password')
+            ->setRoles($roles)
+            ->setBalance(100.0)
+        ;
         if ($isShouldLogin) {
             static::$client->loginUser(static::$user);
         }
