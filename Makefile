@@ -32,3 +32,13 @@ encore_prod:
 
 phpunit:
 	@${PHP} bin/phpunit
+	
+env_create:
+	touch .env.local
+	echo "APP_SECRET=c273489cb9049bef9e63280f61e09f07" >> .env.local
+	echo "DATABASE_URL=pgsql://pguser:pguser@study-on_postgres_1:5432/study_on" >> .env.local
+
+composer_install:
+	${COMPOSER} install
+
+install: env_create up composer_install encore_dev
