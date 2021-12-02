@@ -9,7 +9,7 @@
 </style>
 
 <div class="example-wrapper">
-    <h3>e-mail: {{user.email}}</h3>
+    <h3>e-mail: <label id="email">{{user.email}}</label></h3>
     <h4>Роль:
         {% if 'ROLE_SUPER_ADMIN' in user.roles %}
         админ
@@ -20,7 +20,7 @@
 {#    {{role}},#}
 {#    {% endfor %}#}
     </h4>
-    <h4>Баланс: {{ user.balance }}</h4>
+    <h4>Баланс: <label id="balance">{{ user.balance }}</label></h4>
 {#    <h1>{{app.user.balance}}</h1>#}
 
 </div>

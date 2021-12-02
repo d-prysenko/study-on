@@ -17,7 +17,7 @@ class LessonTest extends AbstractTest
     public function testCreationLesson(): void
     {
         // codecoverage, metrics, code quality, tdd
-        $client = static::getClient();
+        $client = static::getClient(true);
 
         $crawler = $client->request('GET', '/courses');
 
@@ -55,7 +55,7 @@ class LessonTest extends AbstractTest
 
     public function testDeleteLesson(): void
     {
-        $client = static::getClient();
+        $client = static::getClient(true);
 
         $em = self::getEntityManager();
         $lessonRep = $em->getRepository(Lesson::class);

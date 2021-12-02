@@ -4,6 +4,8 @@ namespace App\Security;
 
 use App\Exception\BillingUnavailableException;
 use App\Service\BillingClient;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\ExpiredTokenException;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -34,20 +36,10 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      */
     public function loadUserByIdentifier($identifier): UserInterface
     {
-
         // Load a User object from your data source or throw UserNotFoundException.
         // The $identifier argument may not actually be a username:
         // it is whatever value is being returned by the getUserIdentifier()
         // method in your User class.
-
-//        $token = $this->billingClient->authenticate($identifier);
-
-//        $userInfo = $this->JWTManager->parse($token);
-//
-//        $user = new User();
-//        $user->setApiToken($token);
-//        $user->setEmail($userInfo['username']);
-//        $user->setRoles($userInfo['roles']);
 
         return $this->billingClient->authenticate($identifier);
     }
@@ -79,20 +71,18 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
         }
 
-        $refreshedUser = new User();
+        try {
+            $tokenData = $this->JWTManager->parse($user->getApiToken());
+        } catch (JWTDecodeFailureException $ex) {
+            throw new ExpiredTokenException();
+        }
+        $remainingTime = $tokenData['exp'] - $tokenData['iat'];
 
+        if ($remainingTime < 60) {
+            $this->billingClient->refreshUser($user);
+        }
 
-        // TODO: query to api
-//        try {
-//            $refreshedUser = $this->billingClient->getUser($user->getUserIdentifier());
-//        } catch (BillingUnavailableException $ex) {
-//            throw new ServiceUnavailableHttpException();
-//        }
-        // Return a User object after making sure its data is "fresh".
-        // Or throw a UsernameNotFoundException if the user no longer exists.
-//        throw new \Exception('TODO: fill in refreshUser() inside '.__FILE__);
         return $user;
-//        dd($user);
     }
 
     /**

@@ -5,12 +5,17 @@
 {% block body %}
 
     <h1>Курсы</h1>
-
     <div id="courses">
         {% for course in courses %}
             <div>
                 <a href="{{ path('course_show', {'id': course.id}) }}">{{ course.name }}</a>
                 <div>{{ course.description }}</div>
+                {% if my_courses[course.code] is defined %}
+                    <div>Приобретено</div>
+                {% else %}
+                    <div>Стоимость: {{ course_info[course.code].cost }} руб.</div>
+                    <a href="{{ path('course_buy', {'id': course.id}) }}">Купить</a>
+                {% endif %}
                 <hr>
             </div>
         {% endfor %}

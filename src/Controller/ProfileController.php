@@ -16,7 +16,7 @@ class ProfileController extends AbstractController
         $appUser = $this->getUser();
         $user = null;
         if ($appUser !== null) {
-            $user = $billingClient->getUser($appUser->getUserIdentifier());
+            $user = $billingClient->getCurrentUser();
         }
 
         return $this->render('profile/index.html.twig', [

@@ -16,8 +16,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RegistrationController extends AbstractController
 {
-    public function register(Request $request, BillingAuthenticationManager $authenticator, BillingAuthenticator $billingAuthenticator, BillingClient $billingClient): Response
-    {
+    public function register(
+        Request $request,
+        BillingAuthenticationManager $authenticator,
+        BillingAuthenticator $billingAuthenticator,
+        BillingClient $billingClient
+    ): Response {
 //        if ($this->isGranted('ROLE_USER'))
 //        {
 //           return $this->redirectToRoute('profile');
@@ -34,11 +38,9 @@ class RegistrationController extends AbstractController
                 // calls /api/v1/register via curl
                 $user = $billingClient->register($user);
                 return $authenticator->authenticateUser($user, $billingAuthenticator, $request);
-            }
-            catch (BillingUserAlreadyExists $e) {
+            } catch (BillingUserAlreadyExists $e) {
                 $form->get('email')->addError(new FormError('Пользователь с таким email уже существует'));
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 $error = $e->getMessage();
             }
         }

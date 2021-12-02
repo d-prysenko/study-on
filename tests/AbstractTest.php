@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Security\User;
-use App\Tests\Mock\BillingClientMock;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -22,30 +21,27 @@ abstract class AbstractTest extends WebTestCase
 {
     /** @var Client */
     protected static ?KernelBrowser $client = null;
+    protected static User $user;
 
-    protected static function getClient($reinitialize = false, array $options = [], array $server = [])
+    protected static function getClient(bool $isShouldLogin = false, array $roles = ['ROLE_SUPER_ADMIN', 'ROLE_USER'], bool $reinitialize = false, array $options = [], array $server = [])
     {
         if (!static::$client || $reinitialize) {
             static::$client = static::createClient($options, $server);
+            static::$client->disableReboot();
         }
-
-//        static::$client->disableReboot();
 
         // core is loaded (for tests without calling of getClient(true))
         static::$client->getKernel()->boot();
 
-//        static::$client->getContainer()->set(
-//            BillingClient::class,
-//            new BillingClientMock()
-//        );
+        static::$user = new User();
+        static::$user->setEmail('admin@test.ru');
+        static::$user->setPassword('password');
+        static::$user->setRoles($roles);
+        static::$user->setBalance(100.0);
 
-        $user = new User();
-        $user->setEmail('admin@test.ru');
-        $user->setPassword('password');
-        $user->setRoles(['ROLE_SUPER_ADMIN', 'ROLE_USER']);
-        $user->setBalance(100.0);
-
-        static::$client->loginUser($user);
+        if ($isShouldLogin) {
+            static::$client->loginUser(static::$user);
+        }
 
         return static::$client;
     }

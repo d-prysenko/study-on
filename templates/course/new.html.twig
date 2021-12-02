@@ -5,7 +5,34 @@
 {% block body %}
     <h1>Создать новый курс</h1>
 
-    {{ include('course/_form.html.twig') }}
+    {% if error %}
+        <div class="text-danger">{{ error }}</div>
+    {% endif %}
+
+    {% form_theme form with [
+        'form/row_dateinterval_widget.html.twig'
+    ] %}
+
+    {{ form_start(form, {'attr': {'id': 'course_form'}}) }}
+
+        {{ form_row(form.code) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.type) }}
+
+        <div class="mb-3 animated">
+            {{ form_label(form.price) }}
+            {{ form_widget(form.price) }}
+        </div>
+
+        <div class="mb-3 animated hidden">
+            {{ form_label(form.duration) }}
+            {{ form_widget(form.duration) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+
+    {{ form_end(form) }}
     <hr>
     <a class="btn btn-outline-secondary" href="{{ path('course_index') }}">К списку курсов</a>
 {% endblock %}

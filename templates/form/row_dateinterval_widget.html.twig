@@ -1,0 +1,53 @@
+{% use "bootstrap_5_layout.html.twig" %}
+
+{% block dateinterval_widget -%}
+        {% if not valid %}
+            {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) -%}
+            {% set valid = true %}
+        {% endif %}
+        <div class="row" {{ block('widget_container_attributes') }}>
+            {%- if with_years -%}
+                <div class="col mb-3">
+                    {{ form_label(form.years) }}
+                    {{ form_widget(form.years) }}
+                </div>
+            {%- endif -%}
+            {%- if with_months -%}
+                <div class="col mb-3">
+                    {{ form_label(form.months) }}
+                    {{ form_widget(form.months) }}
+                </div>
+            {%- endif -%}
+{#            {%- if with_weeks -%}#}
+{#                <div class="col mb-3">#}
+{#                    {{ form_label(form.weeks) }}#}
+{#                    {{ form_widget(form.weeks) }}#}
+{#                </div>#}
+{#            {%- endif -%}#}
+            {%- if with_days -%}
+                <div class="col mb-3">
+                    {{ form_label(form.days) }}
+                    {{ form_widget(form.days) }}
+                </div>
+            {%- endif -%}
+{#            {%- if with_hours -%}#}
+{#                <div class="col-auto mb-3">#}
+{#                    {{ form_label(form.hours) }}#}
+{#                    {{ form_widget(form.hours) }}#}
+{#                </div>#}
+{#            {%- endif -%}#}
+{#            {%- if with_minutes -%}#}
+{#                <div class="col-auto mb-3">#}
+{#                    {{ form_label(form.minutes) }}#}
+{#                    {{ form_widget(form.minutes) }}#}
+{#                </div>#}
+{#            {%- endif -%}#}
+{#            {%- if with_seconds -%}#}
+{#                <div class="col-auto mb-3">#}
+{#                    {{ form_label(form.seconds) }}#}
+{#                    {{ form_widget(form.seconds) }}#}
+{#                </div>#}
+{#            {%- endif -%}#}
+{#            {%- if with_invert %}{{ form_widget(form.invert) }}{% endif -%}#}
+        </div>
+{%- endblock dateinterval_widget %}

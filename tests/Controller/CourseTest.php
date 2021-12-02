@@ -5,6 +5,7 @@ namespace App\Tests\Controller;
 use App\DataFixtures\CourseFixtures;
 use App\Entity\Course;
 use App\Entity\Lesson;
+use App\Service\BillingClient;
 use App\Tests\AbstractTest;
 
 class CourseTest extends AbstractTest
@@ -16,7 +17,7 @@ class CourseTest extends AbstractTest
 
     public function testCoursesAndLessonsPages(): void
     {
-        $client = static::getClient();
+        $client = static::getClient(true);
         $em = self::getEntityManager();
         $lessonRep = $em->getRepository(Lesson::class);
         $courseRep = $em->getRepository(Course::class);
@@ -53,7 +54,7 @@ class CourseTest extends AbstractTest
 
     public function testUniqueCourseCreation(): void
     {
-        $client = static::getClient();
+        $client = static::getClient(true);
 
         $crawler = $client->request('GET', '/courses');
 
@@ -75,7 +76,7 @@ class CourseTest extends AbstractTest
 
     public function testCreationCourse(): void
     {
-        $client = static::getClient();
+        $client = static::getClient(true);
 
         $crawler = $client->request('GET', '/courses');
 
@@ -101,7 +102,7 @@ class CourseTest extends AbstractTest
 
     public function testDeleteCourse(): void
     {
-        $client = static::getClient();
+        $client = static::getClient(true);
 
         $crawler = $client->request('GET', '/courses');
 
@@ -122,10 +123,17 @@ class CourseTest extends AbstractTest
         $this->assertEquals(1, $coursesCount);
     }
 
+    public function testUnauthenticated(): void
+    {
+        $client = static::getClient(false);
+        $client->request('GET', '/courses');
+
+        $this->assertResponseRedirect();
+    }
 
     public function testPageIsNotFound(): void
     {
-        $client = static::getClient();
+        $client = static::getClient(true);
         $client->request('GET', '/not-found');
 
         $this->assertResponseNotFound();

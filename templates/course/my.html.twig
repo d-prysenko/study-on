@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Course index{% endblock %}
+
+{% block body %}
+
+    <h1>Мои курсы</h1>
+    <div id="courses">
+        {% for course in courses %}
+            <div>
+                <a href="{{ path('course_show', {'id': course.id}) }}">{{ course.name }}</a>
+                <div>{{ course.description }}</div>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+    {% if courses|length == 0 %}
+        <div>Курсов не найдено</div>
+    {% endif %}
+{% endblock %}
