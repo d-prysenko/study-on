@@ -2,6 +2,7 @@
 
 ```
 git clone https://github.com/d-prysenko/study-on.git
+cd study-on
 make install
 ```
 
