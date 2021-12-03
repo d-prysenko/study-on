@@ -44,7 +44,13 @@ env_create:
 	touch .env.test.local
 	echo "DATABASE_URL=pgsql://pguser:pguser@study-on_postgres_1:5432/study_on_test" >> .env.test.local
 
+db_up:
+	docker-compose exec php bin/console doctrine:database:create
+	docker-compose exec php bin/console doctrine:migrations:migrate
+	docker-compose exec php bin/console doctrine:database:create --env=test
+	docker-compose exec php bin/console doctrine:migrations:migrate --env=test
+
 composer_install:
 	${COMPOSER} install
 
-install: env_create up composer_install encore_install encore_dev
+install: env_create up composer_install db_up fixtload encore_install encore_dev
