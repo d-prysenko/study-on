@@ -27,6 +27,8 @@ require:
 encore_install:
 	${COMPOSE} run node yarn install
 	${COMPOSE} run node yarn add @symfony/webpack-encore --dev
+	${COMPOSE} run node yarn add jquery @popperjs/core --dev
+
 
 encore_dev:
 	@${COMPOSE} run node yarn encore dev

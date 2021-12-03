@@ -7,5 +7,7 @@
 
 import './styles/global.scss';
 
+require('bootstrap');
+require('jquery');
 
 
