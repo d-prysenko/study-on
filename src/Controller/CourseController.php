@@ -11,23 +11,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class CourseController extends AbstractController
 {
     public function index(CourseRepository $courseRepository, BillingClient $billingClient): Response
     {
-//        echo var_export($billingClient->getCourses(true));
-//        die();
-        return $this->render('course/index.html.twig', [
-            'courses' => $courseRepository->findAll(),
-            'course_info' => $billingClient->getCourses(true),
-            'my_courses' => $billingClient->getUserCourses(true),
-        ]);
+        try {
+            return $this->render('course/index.html.twig', [
+                'courses' => $courseRepository->findAll(),
+                'course_info' => $billingClient->getCourses(true),
+                'my_courses' => $billingClient->getUserCourses(true),
+            ]);
+        } catch (\JsonException $ex) {
+            throw new ServiceUnavailableHttpException();
+        }
     }
 
     public function myCourses(CourseRepository $courseRepository, BillingClient $billingClient): Response
     {
-        $courses = $billingClient->getUserCourses(true);
+        try {
+            $courses = $billingClient->getUserCourses(true);
+        } catch (\JsonException $ex) {
+            throw new ServiceUnavailableHttpException();
+        }
 
         $myCourses = [];
         foreach ($courses as $course) {
@@ -44,11 +51,11 @@ class CourseController extends AbstractController
         $course = $courseRepository->findOneBy(['id' => $id]);
 
         if (is_null($course)) {
-            $this->createNotFoundException();
+            throw $this->createNotFoundException();
         }
 
         $response = $billingClient->buyCourse($course->getCode());
-        if ($response['code'] == 200) {
+        if ($response['code'] === 200) {
             return $this->redirectToRoute('my_courses');
         }
 
@@ -86,7 +93,11 @@ class CourseController extends AbstractController
 
     public function show(Course $course, BillingClient $billingClient): Response
     {
-        $courses = $billingClient->getUserCourses(true);
+        try {
+            $courses = $billingClient->getUserCourses(true);
+        } catch (\JsonException $ex) {
+            throw new ServiceUnavailableHttpException();
+        }
 
         $isNotGranted =
             !isset($courses[$course->getCode()]) &&
@@ -111,7 +122,12 @@ class CourseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $billingClient->editCourse($course);
+            try{
+                $billingClient->editCourse($course);
+            } catch (\JsonException $ex) {
+                throw new ServiceUnavailableHttpException();
+            }
+
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('course_index', [], Response::HTTP_SEE_OTHER);

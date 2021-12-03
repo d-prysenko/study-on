@@ -182,12 +182,13 @@ class BillingClient
         return $response;
     }
 
-    /**
-     * @throws JsonException
-     */
     public function buyCourse(string $code): array
     {
-        $response = $this->jsonRequest("/api/v1/courses/$code/buy", CURLOPT_POST, null, true);
+        try {
+            $response = $this->jsonRequest("/api/v1/courses/$code/buy", CURLOPT_POST, null, true);
+        } catch (JsonException $ex) {
+            throw new ServiceUnavailableHttpException();
+        }
 
         if (!isset($response['code'])) {
             throw new ServiceUnavailableHttpException();
