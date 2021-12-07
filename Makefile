@@ -38,7 +38,7 @@ encore_prod:
 
 phpunit:
 	@${PHP} bin/phpunit
-	
+
 env_create:
 	touch .env.local
 	echo "APP_SECRET=c273489cb9049bef9e63280f61e09f07" >> .env.local
@@ -47,12 +47,12 @@ env_create:
 	echo "DATABASE_URL=pgsql://pguser:pguser@study-on_postgres_1:5432/study_on_test" >> .env.test.local
 
 db_up:
-	docker-compose exec php bin/console doctrine:database:create
-	docker-compose exec php bin/console doctrine:migrations:migrate
-	docker-compose exec php bin/console doctrine:database:create --env=test
-	docker-compose exec php bin/console doctrine:migrations:migrate --env=test
+	docker-compose exec php bin/console doctrine:database:create --if-not-exists
+	docker-compose exec php bin/console doctrine:migrations:migrate --no-interaction
+	docker-compose exec php bin/console doctrine:database:create --env=test --if-not-exists
+	docker-compose exec php bin/console doctrine:migrations:migrate --env=test --no-interaction
 
 composer_install:
 	${COMPOSER} install
 
-install: env_create up composer_install db_up fixtload encore_install encore_dev
+install: env_create up composer_install db_up encore_install encore_dev
