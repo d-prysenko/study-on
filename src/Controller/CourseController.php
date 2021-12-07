@@ -122,7 +122,7 @@ class CourseController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try{
+            try {
                 $billingClient->editCourse($course);
             } catch (\JsonException $ex) {
                 throw new ServiceUnavailableHttpException();
