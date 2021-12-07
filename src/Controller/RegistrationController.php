@@ -22,10 +22,6 @@ class RegistrationController extends AbstractController
         BillingAuthenticator $billingAuthenticator,
         BillingClient $billingClient
     ): Response {
-//        if ($this->isGranted('ROLE_USER'))
-//        {
-//           return $this->redirectToRoute('profile');
-//        }
 
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);

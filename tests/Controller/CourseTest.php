@@ -92,6 +92,34 @@ class CourseTest extends AbstractTest
         $this->assertResponseCode(422, $client->getResponse());
     }
 
+//    public function testAccessDenied(): void
+//    {
+//        $client = static::getClient(true, ['ROLE_USER']);
+//
+//        $billingClientMock = $this->createMock(BillingClient::class);
+//        $billingClientMock
+//            ->method('getCourses')
+//            ->willReturn(static::$apiCoursesInfo)
+//        ;
+//
+//        static::$client->getContainer()->set(
+//            BillingClient::class,
+//            $billingClientMock
+//        );
+//
+//        $em = static::getEntityManager();
+//        $courseRep = $em->getRepository(Course::class);
+//
+//        $crawler = $client->request('GET', "/courses");
+//        $this->assertResponseCode(200, $client->getResponse());
+//
+//        $course = $courseRep->findOneBy([]);
+//        $link = $crawler->selectLink($course->getName())->link();
+//        $crawler = $client->click($link);
+//
+//        dd($crawler);
+//    }
+
     public function testCreationCourse(): void
     {
         $client = static::getClient(true);

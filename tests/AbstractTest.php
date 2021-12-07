@@ -33,17 +33,18 @@ abstract class AbstractTest extends WebTestCase
         if (!static::$client || $reinitialize) {
             static::$client = static::createClient($options, $server);
             static::$client->disableReboot();
+
+            static::$user = (new User())
+                ->setEmail('super_admin@email.com')
+                ->setPassword('plain_password')
+                ->setRoles($roles)
+                ->setBalance(100.0)
+            ;
         }
 
         // core is loaded (for tests without calling of getClient(true))
         static::$client->getKernel()->boot();
 
-        static::$user = (new User())
-            ->setEmail('super_admin@email.com')
-            ->setPassword('plain_password')
-            ->setRoles($roles)
-            ->setBalance(100.0)
-        ;
         if ($isShouldLogin) {
             static::$client->loginUser(static::$user);
         }
