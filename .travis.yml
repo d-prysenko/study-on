@@ -21,7 +21,7 @@ before_install:
   - sudo chown -R ${UID:-1000}:${GID:-1000} ${HOME}/.composer
   - sudo /etc/init.d/mysql stop
   - sudo /etc/init.d/postgresql stop
-  - docker network create studyonbilling_default
+  - docker network create study-onbilling_default
 
 install:
   - make install
