@@ -1,0 +1,33 @@
+language: php
+php:
+  - 7.4
+
+cache:
+  directories:
+    - ${HOME}/.composer/cache
+    - ./bin/.phpunit
+
+services:
+  - docker
+
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+before_install:
+  - sudo chown -R ${UID:-1000}:${GID:-1000} $PWD
+  - sudo chown -R ${UID:-1000}:${GID:-1000} ${HOME}/.yarn
+  - sudo chown -R ${UID:-1000}:${GID:-1000} ${HOME}/.composer
+  - sudo /etc/init.d/mysql stop
+  - sudo /etc/init.d/postgresql stop
+  - docker network create studyonbilling_default
+
+install:
+  - make install
+
+script:
+  - make phpunit
+
+after_script:
+  - make down
