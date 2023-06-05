@@ -182,6 +182,13 @@ class BillingClient
         return $response;
     }
 
+    public function getCourse(string $code): array
+    {
+        $response = json_decode($this->request("/api/v1/courses/{$code}", CURLOPT_HTTPGET), true, 512, JSON_THROW_ON_ERROR);
+
+        return $response;
+    }
+
     public function buyCourse(string $code): array
     {
         try {

@@ -133,6 +133,18 @@ class CourseController extends AbstractController
             return $this->redirectToRoute('course_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        $billingCourseInfo = $billingClient->getCourse($course->getCode());
+
+        $form->get('type')->setData($billingCourseInfo['typeString']);
+
+        if (null !== $billingCourseInfo['cost']) {
+            $form->get('price')->setData($billingCourseInfo['cost']);
+        }
+
+        if (null !== $billingCourseInfo['duration']) {
+            $form->get('duration')->setData(new \DateInterval($billingCourseInfo['duration']));
+        }
+
         return $this->renderForm('course/edit.html.twig', [
             'course' => $course,
             'form' => $form,
